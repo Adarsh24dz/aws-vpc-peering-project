@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AWS VPC Peering lab: two VPCs, private EC2 instances, a bastion host, routing, and connectivity validation.">
+  <title>AWS VPC Peering | Cloud Networking Lab</title>
+  <style>
+    :root { color-scheme: dark; --bg:#0b1020; --panel:#111a2e; --panel2:#16213b; --ink:#eef3ff; --muted:#a9b7d3; --line:#293957; --blue:#7cc4ff; --green:#6ee7b7; --amber:#ffd27d; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif; background:radial-gradient(ellipse at top right,#172c50 0%,var(--bg) 50%); color:var(--ink); line-height:1.6; }
+    .wrap { width:min(1100px,92%); margin:0 auto; }
+    header { padding:56px 0 34px; }
+    .eyebrow { color:var(--green); text-transform:uppercase; letter-spacing:.16em; font-size:.78rem; font-weight:700; }
+    h1 { font-size:clamp(2.2rem,5vw,4rem); line-height:1.08; letter-spacing:-.04em; margin:.5rem 0 1rem; }
+    .lead { max-width:760px; color:var(--muted); font-size:1.1rem; }
+    .actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:24px; }
+    a.btn { display:inline-block; border:1px solid var(--line); border-radius:999px; padding:10px 16px; color:var(--ink); text-decoration:none; background:var(--panel); }
+    a.btn.primary { background:var(--blue); color:#08111e; border-color:var(--blue); font-weight:700; }
+    section { padding:24px 0; }
+    h2 { font-size:1.6rem; letter-spacing:-.02em; margin:0 0 14px; }
+    .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+    .card { background:linear-gradient(160deg,var(--panel2),var(--panel)); border:1px solid var(--line); border-radius:18px; padding:20px; min-width:0; }
+    .card h3 { margin:0 0 8px; font-size:1.05rem; }
+    .card p, .muted { color:var(--muted); margin:.35rem 0; }
+    .tag { display:inline-block; font-size:.78rem; border:1px solid var(--line); border-radius:999px; padding:3px 9px; color:var(--blue); }
+    .architecture { overflow-x:auto; border:1px solid var(--line); border-radius:18px; padding:14px; background:#0e1729; }
+    svg { display:block; width:100%; min-width:720px; height:auto; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:16px; }
+    table { width:100%; border-collapse:collapse; min-width:620px; }
+    th,td { text-align:left; padding:12px 14px; border-bottom:1px solid var(--line); }
+    th { color:var(--blue); font-size:.86rem; background:#15213a; }
+    tr:last-child td { border-bottom:0; }
+    code { color:#d7e7ff; background:#0a1222; padding:2px 6px; border-radius:5px; }
+    .status { color:var(--green); font-weight:700; }
+    .notice { padding:14px 16px; border-left:3px solid var(--amber); background:#211d16; color:#ffe8bb; border-radius:8px; }
+    footer { border-top:1px solid var(--line); padding:26px 0 40px; margin-top:30px; color:var(--muted); font-size:.9rem; }
+    @media(max-width:760px) { .grid { grid-template-columns:1fr; } header { padding-top:38px; } }
+  </style>
+</head>
+<body>
+  <header class="wrap">
+    <div class="eyebrow">Cloud networking · Hands-on AWS lab</div>
+    <h1>AWS VPC Peering<br>Project</h1>
+    <p class="lead">A two-VPC networking lab demonstrating private EC2-to-EC2 communication through VPC Peering, route tables, security groups, and a bastion host for controlled administration.</p>
+    <div class="actions">
+      <a class="btn primary" href="https://github.com/Adarsh24dz/aws-vpc-peering-project">View GitHub repository ↗</a>
+      <a class="btn" href="https://github.com/Adarsh24dz/aws-vpc-peering-project/blob/main/README.md">Read project documentation</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section>
+      <h2>Project at a glance</h2>
+      <div class="grid">
+        <article class="card"><span class="tag">VPC A</span><h3>10.10.0.0/16</h3><p>Public subnet for the bastion and a private subnet for App-A.</p></article>
+        <article class="card"><span class="tag">VPC Peering</span><h3>Private routing</h3><p>Non-overlapping VPC CIDRs connected by routes in both directions.</p></article>
+        <article class="card"><span class="tag">VPC B</span><h3>10.20.0.0/16</h3><p>Private subnet hosting App-B without a public IPv4 address.</p></article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Logical architecture</h2>
+      <div class="architecture">
+        <svg viewBox="0 0 960 480" role="img" aria-labelledby="diagram-title diagram-desc">
+          <title id="diagram-title">AWS VPC Peering network architecture</title>
+          <desc id="diagram-desc">The bastion host is in VPC A's public subnet. App-A is in VPC A's private subnet. VPC A peers with VPC B, which contains App-B in a private subnet.</desc>
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#7cc4ff"/></marker>
+          </defs>
+          <rect x="18" y="20" width="560" height="438" rx="18" fill="#12223e" stroke="#4d6d9f" stroke-width="2"/>
+          <text x="42" y="53" fill="#eef3ff" font-size="20" font-weight="700">VPC A · 10.10.0.0/16</text>
+          <rect x="42" y="75" width="240" height="340" rx="12" fill="#172e4e" stroke="#5380ad"/>
+          <text x="58" y="104" fill="#a9d8ff" font-size="15" font-weight="700">Public · 10.10.1.0/24</text>
+          <rect x="62" y="135" width="200" height="92" rx="10" fill="#203b60" stroke="#7cc4ff"/>
+          <text x="162" y="166" text-anchor="middle" fill="#fff" font-size="17" font-weight="700">Bastion</text>
+          <text x="162" y="190" text-anchor="middle" fill="#c6d8f5" font-size="14">10.10.1.128</text>
+          <text x="162" y="210" text-anchor="middle" fill="#c6d8f5" font-size="12">Public IPv4 for admin</text>
+          <rect x="310" y="75" width="244" height="340" rx="12" fill="#172e4e" stroke="#5380ad"/>
+          <text x="326" y="104" fill="#a9d8ff" font-size="15" font-weight="700">Private · 10.10.2.0/24</text>
+          <rect x="332" y="135" width="200" height="92" rx="10" fill="#203b60" stroke="#7cc4ff"/>
+          <text x="432" y="166" text-anchor="middle" fill="#fff" font-size="17" font-weight="700">App-A</text>
+          <text x="432" y="191" text-anchor="middle" fill="#c6d8f5" font-size="14">10.10.2.10</text>
+          <text x="432" y="210" text-anchor="middle" fill="#c6d8f5" font-size="12">No public IP</text>
+          <line x1="262" y1="180" x2="332" y2="180" stroke="#7cc4ff" stroke-width="2" marker-end="url(#arrow)"/>
+          <text x="297" y="165" fill="#c6d8f5" text-anchor="middle" font-size="11">SSH</text>
+          <rect x="625" y="20" width="317" height="438" rx="18" fill="#102b2c" stroke="#448f82" stroke-width="2"/>
+          <text x="649" y="53" fill="#eef3ff" font-size="20" font-weight="700">VPC B · 10.20.0.0/16</text>
+          <rect x="649" y="75" width="269" height="340" rx="12" fill="#163a3c" stroke="#448f82"/>
+          <text x="665" y="104" fill="#9de7d4" font-size="15" font-weight="700">Private · 10.20.1.0/24</text>
+          <rect x="682" y="135" width="202" height="92" rx="10" fill="#1b5050" stroke="#6ee7b7"/>
+          <text x="783" y="166" text-anchor="middle" fill="#fff" font-size="17" font-weight="700">App-B</text>
+          <text x="783" y="191" text-anchor="middle" fill="#c3f2e5" font-size="14">10.20.1.10</text>
+          <text x="783" y="210" text-anchor="middle" fill="#c3f2e5" font-size="12">No public IP</text>
+          <path d="M432 245 V295 H783 V245" stroke="#6ee7b7" stroke-width="3" fill="none" stroke-dasharray="7 6" marker-end="url(#arrow)"/>
+          <rect x="475" y="274" width="260" height="42" rx="12" fill="#0d2429" stroke="#448f82"/>
+          <text x="605" y="291" text-anchor="middle" fill="#9de7d4" font-size="13" font-weight="700">VPC Peering</text>
+          <text x="605" y="306" text-anchor="middle" fill="#c3f2e5" font-size="11">Private traffic · routes both ways</text>
+          <text x="48" y="440" fill="#a9b7d3" font-size="12">Internet Gateway is attached to VPC A for bastion access.</text>
+        </svg>
+      </div>
+      <p class="muted">Illustration of the intended design; it is not a live diagram of AWS resources.</p>
+    </section>
+
+    <section>
+      <h2>Resources</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Component</th><th>Name</th><th>Address / purpose</th></tr></thead>
+        <tbody>
+          <tr><td>VPC A</td><td><code>ewb-vpc-a</code></td><td><code>10.10.0.0/16</code></td></tr>
+          <tr><td>VPC B</td><td><code>ewb-vpc-b</code></td><td><code>10.20.0.0/16</code></td></tr>
+          <tr><td>Public subnet</td><td><code>ewb-a-public</code></td><td><code>10.10.1.0/24</code> · Bastion</td></tr>
+          <tr><td>Private subnet</td><td><code>ewb-a-private</code></td><td><code>10.10.2.0/24</code> · App-A</td></tr>
+          <tr><td>Private subnet</td><td><code>ewb-b-private</code></td><td><code>10.20.1.0/24</code> · App-B</td></tr>
+          <tr><td>Bastion host</td><td><code>ewb-bastion</code></td><td><code>10.10.1.128</code></td></tr>
+          <tr><td>Application host A</td><td><code>ewb-app-a</code></td><td><code>10.10.2.10</code></td></tr>
+          <tr><td>Application host B</td><td><code>ewb-app-b</code></td><td><code>10.20.1.10</code></td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section>
+      <h2>Validation results</h2>
+      <div class="grid">
+        <article class="card"><h3><span class="status">PASS</span> · SSH</h3><p>SSH from the bastion to both private EC2 instances succeeded during the lab.</p></article>
+        <article class="card"><h3><span class="status">PASS</span> · App-A → App-B</h3><p>ICMP ping returned 4 of 4 packets (0% packet loss).</p></article>
+        <article class="card"><h3><span class="status">PASS</span> · App-B → App-A</h3><p>ICMP ping returned 4 of 4 packets (0% packet loss).</p></article>
+      </div>
+      <p class="muted">Results reflect the lab session and do not guarantee that AWS resources are still running.</p>
+    </section>
+
+    <section>
+      <h2>Security notes</h2>
+      <div class="notice">Private EC2 instances have no public IP addresses. Keep SSH restricted to trusted sources; never use <code>0.0.0.0/0</code> for SSH. Never publish a PEM private key or AWS credentials.</div>
+    </section>
+
+    <section>
+      <h2>Project documentation</h2>
+      <div class="card">
+        <p>The repository README includes network addressing, routing, security design, tests, reproduction outline, and cleanup guidance.</p>
+        <p><a href="https://github.com/Adarsh24dz/aws-vpc-peering-project" style="color:var(--blue)">Open the source repository ↗</a></p>
+      </div>
+    </section>
+  </main>
+  <footer><div class="wrap">AWS VPC Peering Lab · Educational project · Review AWS costs and clean up project-only resources after collecting evidence.</div></footer>
+</body>
+</html>
