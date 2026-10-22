@@ -12,6 +12,13 @@ A hands-on AWS networking project demonstrating private communication between tw
 - Use a bastion host to administer the private instances over SSH.
 - Verify connectivity using SSH and ICMP ping tests.
 
+## Live project link
+
+**[Open the hosted project showcase](https://adarsh24dz.github.io/aws-vpc-peering-project/)**
+
+This URL is a public GitHub Pages portfolio/demo page showing the design and test summary. It is **not** a live application endpoint inside the VPC. App-A and App-B intentionally have no public IPv4 addresses; the actual network validation is evidenced by the report screenshots and AWS console/terminal captures.
+
+
 ## Architecture
 
 ```text
@@ -97,6 +104,13 @@ The following checks were completed during the lab:
 These are results observed during the lab session. They are not a guarantee that resources remain running or that configuration has not changed since then.
 
 ## Evidence screenshots
+
+**Important:** a filename checklist alone is not evidence. The repository's `evidence/` directory currently has a manifest; the PNG screenshot binaries still need to be uploaded from the prepared evidence package before a reviewer can open them directly on GitHub. The final 24-page PDF report contains a 20-page screenshot appendix and can also be submitted as a separate attachment.
+
+To make repository verification complete:
+1. Upload all 20 PNGs from the package's `evidence/` folder into this repository's `evidence/` directory.
+2. Upload `AWS_VPC_Peering_Project_Report.pdf` into `docs/`.
+3. Keep the image names listed in [the evidence manifest](evidence/README.md) aligned with the uploaded files.
 
 The `evidence/` folder contains a checklist. Add screenshots you captured from your own AWS console and terminal. Recommended evidence:
 
