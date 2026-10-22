@@ -38,7 +38,7 @@ A hands-on AWS networking project demonstrating private communication between tw
                          App-B: 10.20.1.10
 ```
 
-> The diagram documents the intended logical topology. Actual resource IDs and live AWS configuration can change; refer to the screenshots/evidence captured during deployment.
+> The diagram documents the intended logical topology. Actual resource IDs and live AWS configuration can change; refer to screenshots you capture during deployment.
 
 ## AWS resources
 
@@ -98,33 +98,20 @@ These are results observed during the lab session. They are not a guarantee that
 
 ## Evidence screenshots
 
-Create an `evidence/` folder and add screenshots you captured from your own AWS console and terminal. Recommended evidence:
+The `evidence/` folder contains a checklist. Add screenshots you captured from your own AWS console and terminal. Recommended evidence:
 
 1. VPC A and VPC B details with CIDRs.
 2. All three subnet details.
 3. VPC Peering connection showing Active status.
 4. Route tables: `ewb-rt-a-public`, `ewb-rt-a-private`, and `ewb-rt-b-private`.
-5. Internet Gateway `ewb-igw-a) attached to VPC A.
+5. Internet Gateway `ewb-igw-a` attached to VPC A.
 6. The three EC2 instances and their private IPs.
 7. Security group inbound rules for the bastion, App-A, and App-B.
 8. Successful SSH session from bastion to App-B.
 9. Successful ping in both directions.
+10. Reachability Analyzer showing the successful path.
 
-After adding the screenshots, you can link them here, for example:
-
-```text
-evidence/
-  vpc-details.png
-  subnets.png
-  peering-active.png
-  routes-a-public.png
-  routes-a-private.png
-  routes-b-private.png
-  ec2-instances.png
-  ssh-app-b.png
-  ping-a-to-b.png
-  ping-b-to-a.png
-```
+Do not add screenshots that reveal private keys, passwords, tokens, or credentials.
 
 ## Reproduction outline
 
@@ -145,7 +132,11 @@ AWS resources can incur charges, including EC2 instances, EBS volumes, and publi
 
 ## Hosted project page
 
-Once GitHub Pages is enabled, add the published URL here.
+The static website is in [`index.html`](index.html). To publish it, open **Settings → Pages**, choose **Deploy from a branch**, select **main** and **/(root)**, then save. After GitHub Pages finishes building, GitHub will show the published URL in this section of repository settings.
+
+## Project report
+
+See [docs/PROJECT_REPORT.md](docs/PROJECT_REPORT.md) for the internship-style report draft.
 
 ## License
 
