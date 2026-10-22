@@ -3,7 +3,10 @@
 **Project type:** Hands-on cloud networking lab  
 **Cloud provider:** Amazon Web Services (AWS)  
 **Region used:** Europe (Stockholm), `eu-north-1`  
-**Status:** Core connectivity validated during the lab session
+**Status:** Core connectivity validated during the lab session  
+**Live project showcase:** https://adarsh24dz.github.io/aws-vpc-peering-project/
+
+> The live link is a static GitHub Pages portfolio/demo page. The private EC2 instances are not exposed as public web applications. The report's screenshot appendix is available in the submission PDF supplied separately; the PDF and binary screenshot files are not yet uploaded into this GitHub repository.
 
 ## 1. Objective
 
