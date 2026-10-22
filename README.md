@@ -144,13 +144,18 @@ This repository is a lab record, not an infrastructure-as-code deployment. It cu
 
 AWS resources can incur charges, including EC2 instances, EBS volumes, and public IPv4 addresses. When the project evidence is complete, review the resources and terminate only the resources created for this project if they are no longer needed. Do not terminate unrelated learning instances. Then remove project-only peering connections, route resources, gateways, subnets, and VPCs as appropriate.
 
-## Hosted project page
+## Live project link
 
-The static website is in [`index.html`](index.html). To publish it, open **Settings → Pages**, choose **Deploy from a branch**, select **main** and **/(root)**, then save. After GitHub Pages finishes building, GitHub will show the published URL in this section of repository settings.
+**[Open the live GitHub Pages showcase](https://adarsh24dz.github.io/aws-vpc-peering-project/)**
+
+This is a hosted portfolio/demo website showing the architecture, resource inventory, and test summary. It is not a live application hosted inside the VPC. The two application EC2 instances are private and have no public IPv4 address, so their connectivity is demonstrated through the attached evidence and the AWS console/terminal tests.
 
 ## Project report
 
-See [docs/PROJECT_REPORT.md](docs/PROJECT_REPORT.md) for the internship-style report draft.
+- [Internship report (Markdown)](docs/PROJECT_REPORT.md)
+- [Evidence screenshot manifest](evidence/README.md)
+
+**Evidence upload status:** The local submission ZIP contains the actual screenshot PNGs, and the PDF report contains the screenshots in its appendix. The PNG files and PDF itself are not yet committed as binary assets in this GitHub repository. To make them directly accessible on GitHub, extract the [evidence ZIP](#) locally and upload the PNGs to `evidence/`; upload the PDF report to `docs/`. Do not list them as repository attachments until those uploads are complete.
 
 ## License
 
