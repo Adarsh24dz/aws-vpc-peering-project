@@ -155,7 +155,7 @@ This is a hosted portfolio/demo website showing the architecture, resource inven
 - [Internship report (Markdown)](docs/PROJECT_REPORT.md)
 - [Evidence screenshot manifest](evidence/README.md)
 
-**Evidence upload status:** The local submission ZIP contains the actual screenshot PNGs, and the PDF report contains the screenshots in its appendix. The PNG files and PDF itself are not yet committed as binary assets in this GitHub repository. To make them directly accessible on GitHub, extract the [evidence ZIP](#) locally and upload the PNGs to `evidence/`; upload the PDF report to `docs/`. Do not list them as repository attachments until those uploads are complete.
+**Evidence upload status:** The downloadable submission package provided in this conversation contains the actual screenshot PNGs, and the PDF report contains the screenshots in its appendix. The PNG files and PDF itself are not yet committed as binary assets in this GitHub repository. To make them directly accessible on GitHub, download and extract the evidence ZIP, upload the PNGs to `evidence/`, and upload the PDF report to `docs/`. Do not list them as repository attachments until those uploads are complete.
 
 ## License
 
